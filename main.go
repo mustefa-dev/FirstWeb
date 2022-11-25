@@ -1,23 +1,30 @@
 package main
 
 import (
-	"fmt"
+	"awesomeMu0.2/controllers"
 	"github.com/gorilla/mux"
 	"net/http"
 )
 
-func home(w http.ResponseWriter, r *http.Request) {
-	r.Header.Set("Content-type", "text/html")
-	fmt.Fprint(w, "<h1>hello</h1>")
-}
-func contact(w http.ResponseWriter, r *http.Request) {
-	r.Header.Set("Content-type", "text/html")
-	fmt.Fprint(w, "mailto:support@mu.com")
+func main() {
+	staticC := controllers.NewStatic()
+	userC := controllers.NewUser()
+	r := mux.NewRouter()
+	r.Handle("/", staticC.HomeView).Methods("GET")
+	r.Handle("/C", staticC.ContactsView).Methods("GET")
+	r.HandleFunc("/SignUp/", userC.New).Methods("GET")
+	r.HandleFunc("/SignUp/", userC.Create).Methods("POST")
+
+	err := http.ListenAndServe(":2000", r)
+	if err != nil {
+		return
+	}
 
 }
-func main() {
-	r := mux.NewRouter()
-	r.HandleFunc("/", home)
-	r.HandleFunc("/contact/", contact)
-	http.ListenAndServe(":2000", r)
+func must(err error) {
+	if err != nil {
+		panic(err)
+	}
 }
+
+// 44 lines, before using static.go
